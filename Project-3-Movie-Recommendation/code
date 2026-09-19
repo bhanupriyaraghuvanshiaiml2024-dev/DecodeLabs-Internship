@@ -1,0 +1,71 @@
+import pandas as pd
+
+# Load dataset
+data = pd.read_csv("movies.csv")
+
+print("===================================")
+print("      MOVIE RECOMMENDATION SYSTEM")
+print("===================================\n")
+
+# User preferences
+genre = input("Enter your preferred genre: ")
+language = input("Enter your preferred language: ")
+rating = float(input("Enter your minimum preferred rating (1-10): "))
+
+# Clean input
+genre = genre.strip().title()
+language = language.strip().title()
+
+# Ask importance of each preference
+print("\nRate the importance of each preference from 1 to 5.")
+
+genre_weight = int(input("Importance of Genre: "))
+language_weight = int(input("Importance of Language: "))
+rating_weight = int(input("Importance of Rating: "))
+
+# Start score
+data["Score"] = 0
+
+# Calculate similarity score
+for i in range(len(data)):
+
+    score = 0
+
+    # Genre match
+    if data.loc[i, "Genre"] == genre:
+        score += genre_weight
+
+    # Language match
+    if data.loc[i, "Language"] == language:
+        score += language_weight
+
+    # Rating match
+    if data.loc[i, "Rating"] >= rating:
+        score += rating_weight
+
+    data.loc[i, "Score"] = score
+
+# Sort by highest score
+data = data.sort_values(by="Score", ascending=False)
+
+# Check recommendations
+if data.iloc[0]["Score"] == 0:
+
+    print("\nSorry, no suitable recommendations found.")
+
+else:
+
+    print("\n===================================")
+    print("       TOP 3 RECOMMENDATIONS")
+    print("===================================\n")
+
+    top_movies = data.head(3)
+
+    for index, movie in top_movies.iterrows():
+
+        print("Movie:", movie["Movie"])
+        print("Genre:", movie["Genre"])
+        print("Language:", movie["Language"])
+        print("Rating:", movie["Rating"])
+        print("Similarity Score:", movie["Score"])
+        print("-----------------------------------")
